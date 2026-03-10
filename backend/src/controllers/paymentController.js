@@ -9,14 +9,10 @@ const createPayment = async (req, res) => {
             return res.status(400).json({ success: false, message: "orderId and method are required" });
         }
 
-        // ─── DEMO MODE: AUTO-CONFIRM ALL PAYMENTS ───
-        // Bypass Omise entirely — instantly mark the order as paid and confirmed.
+        // ─── DEMO MODE: mark payment as paid, leave order status as 'pending' ───
+        // Admin will manually confirm and update status on their end.
         await db.query(
-            `UPDATE orders SET status = 'confirmed', payment_status = 'paid' WHERE order_id = $1`,
-            [orderId]
-        );
-        await db.query(
-            `INSERT INTO order_status_logs (order_id, status, changed_by, note) VALUES ($1, 'confirmed', 'system', 'Demo: Auto-Confirmed Payment')`,
+            `UPDATE orders SET payment_status = 'paid' WHERE order_id = $1`,
             [orderId]
         );
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CreditCard, Truck, MapPin, Phone, User, CheckCircle } from 'lucide-react';
 import { createOrder, createPayment, getImageUrl, getMyAddresses, addMyAddress } from '../api';
@@ -31,6 +31,7 @@ const CheckoutPage = () => {
     const [isAddingAddr, setIsAddingAddr] = useState(false);
     const [newAddr, setNewAddr] = useState({ recipient_name: '', address_line: '', province: '', postal_code: '' });
     const [loading, setLoading] = useState(false);
+    const checkoutSuccessRef = useRef(false);
 
     const handleChange = (e) => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
 
@@ -102,6 +103,7 @@ const CheckoutPage = () => {
 
             // DEMO MODE: call createPayment (backend auto-confirms), then go straight to track page
             await createPayment(newOrderId, form.payment_method);
+            checkoutSuccessRef.current = true;
             clearCart();
             navigate(`/orders/${newOrderId}/track`);
         } catch (err) {
@@ -113,7 +115,7 @@ const CheckoutPage = () => {
     };
 
     useEffect(() => {
-        if (items.length === 0 && !loading) {
+        if (items.length === 0 && !loading && !checkoutSuccessRef.current) {
             navigate('/cart');
         }
     }, [items.length, navigate, loading]);
