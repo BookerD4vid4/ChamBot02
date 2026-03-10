@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, ShoppingCart, Package, Tag, CheckCircle, AlertTriangle } from 'lucide-react';
 import { getProductById, getImageUrl } from '../api';
 import ProductImage from '../components/ProductImage';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import './ProductDetailPage.css';
 
@@ -12,6 +13,8 @@ const formatPrice = (p) =>
 
 const ProductDetailPage = () => {
     const { id } = useParams();
+    const navigate = useNavigate();
+    const { user } = useAuth();
     const { addItem } = useCart();
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -30,6 +33,13 @@ const ProductDetailPage = () => {
     }, [id]);
 
     const handleAddToCart = () => {
+        if (!user) {
+            toast.error('กรุณาเข้าสู่ระบบก่อนเพิ่มสินค้าลงตะกร้า', {
+                style: { background: '#1f2937', color: '#f9fafb', border: '1px solid #ef4444' }
+            });
+            navigate('/login');
+            return;
+        }
         if (!selectedVariant) return;
         addItem(product, selectedVariant, qty);
         toast.success(`เพิ่ม ${product.name} ลงตะกร้าแล้ว!`, {

@@ -61,12 +61,14 @@ const Navbar = () => {
                     {/* Actions */}
                     <div className="navbar-actions">
                         {/* Cart */}
-                        <button className="cart-btn" onClick={() => setCartOpen(true)}>
-                            <ShoppingCart size={20} />
-                            {totalItems > 0 && (
-                                <span className="cart-badge">{totalItems}</span>
-                            )}
-                        </button>
+                        {user && (
+                            <button className="cart-btn" onClick={() => setCartOpen(true)}>
+                                <ShoppingCart size={20} />
+                                {totalItems > 0 && (
+                                    <span className="cart-badge">{totalItems}</span>
+                                )}
+                            </button>
+                        )}
 
                         {/* Auth */}
                         {user ? (
@@ -105,7 +107,9 @@ const Navbar = () => {
                             />
                         </form>
                         <Link to="/shop" className="mobile-nav-link" onClick={() => setMenuOpen(false)}>สินค้า</Link>
-                        <Link to="/cart" className="mobile-nav-link" onClick={() => setMenuOpen(false)}>ตะกร้า ({totalItems})</Link>
+                        {user && (
+                            <Link to="/cart" className="mobile-nav-link" onClick={() => setMenuOpen(false)}>ตะกร้า ({totalItems})</Link>
+                        )}
                         {isAdmin && (
                             <Link to="/admin/dashboard" className="mobile-nav-link" onClick={() => setMenuOpen(false)}>Admin Panel</Link>
                         )}

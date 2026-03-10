@@ -21,6 +21,9 @@ export const AuthProvider = ({ children }) => {
         setToken(null);
         localStorage.removeItem('chambot_user');
         localStorage.removeItem('chambot_token');
+        localStorage.removeItem('chambot_cart');
+        sessionStorage.removeItem('chatbot_messages');
+        window.location.href = '/login'; // Force app reload to clear memory state
     };
 
     const isAdmin = user?.role === 'admin';

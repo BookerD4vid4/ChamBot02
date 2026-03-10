@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, Bot, User, ShoppingBag, MapPin, CreditCard, Banknote, RotateCcw } from 'lucide-react';
 import { sendChatMessage } from '../api';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import './ChatbotWidget.css';
@@ -25,6 +26,7 @@ const ChatbotWidget = () => {
     const [loading, setLoading] = useState(false);
     const bottomRef = useRef(null);
     const { items, addItem, removeItem, updateQty, clearCart, isOpen: isCartOpen } = useCart();
+    const { user } = useAuth();
     const [checkoutAddressId, setCheckoutAddressId] = useState(null);
     const navigate = useNavigate();
 
@@ -81,6 +83,13 @@ const ChatbotWidget = () => {
                 } else if (a.type === 'clear_cart') {
                     clearCart();
                 } else if (a.type === 'add_to_cart') {
+                    if (!user) {
+                        toast.error('กรุณาเข้าสู่ระบบก่อนเพิ่มสินค้าลงตะกร้า', {
+                            style: { background: '#1f2937', color: '#f9fafb', border: '1px solid #ef4444' }
+                        });
+                        navigate('/login');
+                        return;
+                    }
                     // addItem(product, variant, quantity, silent)
                     addItem(a.product, a.variant, a.quantity ?? 1, true);
                     toast.success(`เพิ่ม "${a.product.name}" ลงตะกร้าแล้ว! 🛒`);
@@ -244,6 +253,13 @@ const ChatbotWidget = () => {
                                             className="chatbot-action-btn"
                                             style={{ marginTop: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', background: 'rgba(16, 185, 129, 0.15)', borderColor: '#34d399', color: '#34d399' }}
                                             onClick={() => {
+                                                if (!user) {
+                                                    toast.error('กรุณาเข้าสู่ระบบก่อนเพิ่มสินค้าลงตะกร้า', {
+                                                        style: { background: '#1f2937', color: '#f9fafb', border: '1px solid #ef4444' }
+                                                    });
+                                                    navigate('/login');
+                                                    return;
+                                                }
                                                 a.items.forEach(item => addItem(item.product, item.variant, item.quantity, true));
                                                 toast.success(`เพิ่มสินค้าจากออเดอร์ #${a.order_id} ลงตะกร้าแล้ว! 🛒`);
                                             }}
