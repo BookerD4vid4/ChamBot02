@@ -11,7 +11,7 @@ const formatPrice = (p) =>
     new Intl.NumberFormat('th-TH', { style: 'currency', currency: 'THB', maximumFractionDigits: 0 }).format(p);
 
 const PAYMENT_METHODS = [
-    { value: 'promptpay', label: 'PromptPay', icon: '📱', desc: 'สแกน QR จ่ายผ่าน PromptPay' },
+    { value: 'qr', label: 'PromptPay', icon: '📱', desc: 'สแกน QR จ่ายผ่าน PromptPay' },
     { value: 'cod', label: 'เก็บเงินปลายทาง', icon: '💵', desc: 'จ่ายตอนรับสินค้า' },
 ];
 
@@ -22,7 +22,7 @@ const CheckoutPage = () => {
 
     const [form, setForm] = useState({
         name: user?.name || user?.full_name || '', phone: user?.phone || user?.phone_number || '',
-        payment_method: 'promptpay'
+        payment_method: 'qr'
     });
     
     // Address management
@@ -90,24 +90,35 @@ const CheckoutPage = () => {
                 user_id: user?.id || null,
                 total_amount: totalPrice,
                 payment_method: form.payment_method,
+                address_id: selectedAddressId,
                 address: addressString,
                 items: items.map(i => ({ variant_id: i.variant_id, price: i.price, quantity: i.quantity })),
             });
-            const newOrderId = orderRes.data?.order?.order_id || orderRes.data?.orderId;
+            const newOrderId = orderRes.data?.data?.order_id || orderRes.data?.order?.order_id || orderRes.data?.orderId;
+            
+            if (!newOrderId) {
+                throw new Error("Cannot retrieve order ID from response");
+            }
 
-            // DEMO MODE: call createPayment (backend auto-confirms), then go straight to success
+            // DEMO MODE: call createPayment (backend auto-confirms), then go straight to track page
             await createPayment(newOrderId, form.payment_method);
             clearCart();
-            navigate('/order-success');
-        } catch {
+            navigate(`/orders/${newOrderId}/track`);
+        } catch (err) {
+            console.error("Checkout error:", err);
             toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง');
         } finally {
             setLoading(false);
         }
     };
 
+    useEffect(() => {
+        if (items.length === 0 && !loading) {
+            navigate('/cart');
+        }
+    }, [items.length, navigate, loading]);
+
     if (items.length === 0) {
-        navigate('/cart');
         return null;
     }
 
@@ -145,15 +156,14 @@ const CheckoutPage = () => {
                             {addresses.length > 0 && !isAddingAddr && (
                                 <div className="checkout-address-list">
                                     {addresses.map(addr => (
-                                        <label key={addr.address_id} className={`checkout-addr-card ${selectedAddressId === addr.address_id ? 'selected' : ''}`}>
-                                            <input type="radio" name="address_id" value={addr.address_id} checked={selectedAddressId === addr.address_id} onChange={() => setSelectedAddressId(addr.address_id)} />
+                                        <div key={addr.address_id} className={`checkout-addr-card ${selectedAddressId === addr.address_id ? 'selected' : ''}`} onClick={() => setSelectedAddressId(addr.address_id)} style={{ cursor: 'pointer' }}>
                                             <div className="checkout-addr-info">
                                                 <strong>{addr.recipient_name}</strong>
                                                 <p>{addr.address_line}</p>
                                                 <p>{[addr.province, addr.postal_code].filter(Boolean).join(' ')}</p>
                                             </div>
                                             {selectedAddressId === addr.address_id && <CheckCircle size={18} className="payment-check" />}
-                                        </label>
+                                        </div>
                                     ))}
                                 </div>
                             )}

@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
+import { cancelMyOrder } from '../api';
+import { useAuth } from '../context/AuthContext';
+import toast from 'react-hot-toast';
 import './OrderTrackPage.css';
 
 const API = process.env.REACT_APP_API_URL || 'http://localhost:5000';
@@ -73,9 +76,11 @@ function TimelineItem({ entry, isLast }) {
 
 export default function OrderTrackPage() {
     const { id } = useParams();
+    const { user } = useAuth();
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [isCancelling, setIsCancelling] = useState(false);
 
     useEffect(() => {
         axios.get(`${API}/api/orders/${id}/track`)
@@ -116,6 +121,34 @@ export default function OrderTrackPage() {
                     <h1 className="track-title">ติดตามพัสดุ</h1>
                     <div className="track-order-id">คำสั่งซื้อ #{data.order_id}</div>
                 </div>
+
+                {/* Cancel Button (Only if user is logged in & order is pending/confirmed) */}
+                {user && (data.status === 'pending' || data.status === 'confirmed') && (
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
+                        <button 
+                            className="btn btn-secondary" 
+                            style={{ color: '#ef4444', borderColor: '#ef4444' }}
+                            onClick={async () => {
+                                if (!window.confirm('คุณแน่ใจหรือไม่ว่าต้องการยกเลิกคำสั่งซื้อนี้?')) return;
+                                setIsCancelling(true);
+                                try {
+                                    await cancelMyOrder(data.order_id);
+                                    toast.success('ยกเลิกคำสั่งซื้อเรียบร้อยแล้ว');
+                                    // Refresh status
+                                    const res = await axios.get(`${API}/api/orders/${id}/track`);
+                                    setData(res.data.data);
+                                } catch (err) {
+                                    toast.error(err.response?.data?.message || 'ไม่สามารถยกเลิกคำสั่งซื้อได้');
+                                } finally {
+                                    setIsCancelling(false);
+                                }
+                            }}
+                            disabled={isCancelling}
+                        >
+                            {isCancelling ? 'กำลังดำเนินการ...' : 'ยกเลิกคำสั่งซื้อ'}
+                        </button>
+                    </div>
+                )}
 
                 {/* Status Hero */}
                 <div className={`status-hero ${cancelled ? 'cancelled' : ''}`}>

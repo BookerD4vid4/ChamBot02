@@ -229,4 +229,42 @@ const createOrder = async ({ user_id, items, total_amount, payment_method, addre
 };
 
 
-module.exports = { findAll, findById, findByUserId, updateStatus, addStatusLog, getTimeline, getStatus, createOrder };
+// ─── User Cancel Order ────────────────────────────────────────────────────────
+const cancelOrder = async (orderId, userId) => {
+    // 1. Check if the order belongs to the user and is still 'pending'
+    const orderRes = await db.query(
+        "SELECT status FROM orders WHERE order_id = $1 AND user_id = $2",
+        [orderId, userId]
+    );
+
+    if (orderRes.rows.length === 0) {
+        throw Object.assign(new Error("Order not found or you do not have permission to cancel it"), { statusCode: 404 });
+    }
+
+    const currentStatus = orderRes.rows[0].status;
+    if (currentStatus !== 'pending' && currentStatus !== 'confirmed') {
+        throw Object.assign(new Error(`Order cannot be cancelled because it is already '${currentStatus}'`), { statusCode: 400 });
+    }
+
+    // 2. Update status and log
+    await db.query("BEGIN");
+    try {
+        const updateRes = await db.query(
+            "UPDATE orders SET status = 'cancelled', updated_at = NOW() WHERE order_id = $1 RETURNING *",
+            [orderId]
+        );
+        
+        await db.query(
+            "INSERT INTO order_status_logs (order_id, status, changed_by, note) VALUES ($1, 'cancelled', 'user', 'Cancelled by user')",
+            [orderId]
+        );
+
+        await db.query("COMMIT");
+        return updateRes.rows[0];
+    } catch (err) {
+        await db.query("ROLLBACK");
+        throw err;
+    }
+};
+
+module.exports = { findAll, findById, findByUserId, updateStatus, addStatusLog, getTimeline, getStatus, createOrder, cancelOrder };

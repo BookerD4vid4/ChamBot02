@@ -6,6 +6,7 @@ const orderService = require("../services/orderService");
 const ok = (res, data, meta = {}) => res.status(200).json({ success: true, data, ...meta });
 const created = (res, data) => res.status(201).json({ success: true, data });
 const fail = (res, err) => {
+    console.error("DEBUG ERROR:", err);
     const code = err.statusCode || 500;
     res.status(code).json({ success: false, message: err.message });
 };
@@ -65,4 +66,12 @@ const createOrder = async (req, res) => {
     } catch (err) { fail(res, err); }
 };
 
-module.exports = { getAllOrders, getOrderById, updateStatus, getMyOrders, trackOrder, createOrder };
+// ─── User: PATCH /api/orders/:id/cancel ──────────────────────────────────────
+const cancelOrder = async (req, res) => {
+    try {
+        const order = await orderService.cancelOrder(req.params.id, req.user.id);
+        ok(res, order);
+    } catch (err) { fail(res, err); }
+};
+
+module.exports = { getAllOrders, getOrderById, updateStatus, getMyOrders, trackOrder, createOrder, cancelOrder };

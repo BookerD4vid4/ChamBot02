@@ -65,4 +65,9 @@ const createOrder = async (payload) => {
     return repo.createOrder(payload);
 };
 
-module.exports = { getAllOrders, getOrderById, getMyOrders, trackOrder, updateStatus, createOrder };
+// ─── Cancel Order ───────────────────────────────────────────────────────────
+const cancelOrder = async (orderId, userId) => {
+    return repo.cancelOrder(orderId, userId);
+};
+
+module.exports = { getAllOrders, getOrderById, getMyOrders, trackOrder, updateStatus, createOrder, cancelOrder };

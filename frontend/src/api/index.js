@@ -63,6 +63,7 @@ export const getOrderById = (id) => API.get(`/orders/${id}`);
 export const createOrder = (data) => API.post('/orders', data);
 export const getMyOrders = (params = {}) => API.get('/orders/my', { params });
 export const trackOrder = (id) => API.get(`/orders/${id}/track`);
+export const cancelMyOrder = (id) => API.patch(`/orders/${id}/cancel`);
 
 // ─── Orders (Admin) ─────────────────────────────────────
 export const getAdminOrders = (params = {}) => API.get('/admin/orders', { params });

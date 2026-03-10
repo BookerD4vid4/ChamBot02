@@ -14,4 +14,7 @@ router.get("/:id/track", ctrl.trackOrder);
 // POST /api/orders  — place order
 router.post("/", ctrl.createOrder);
 
+// PATCH /api/orders/:id/cancel  — user cancel own order
+router.patch("/:id/cancel", requireAuth, ctrl.cancelOrder);
+
 module.exports = router;

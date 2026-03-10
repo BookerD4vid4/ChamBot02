@@ -65,13 +65,13 @@ const verifyOtp = async (req, res) => {
         let customer;
         let isNewCustomer = false;
         
-        const custResult = await db.query(`SELECT * FROM customers WHERE phone = $1 LIMIT 1`, [phone]);
+        const custResult = await db.query(`SELECT * FROM users WHERE phone_number = $1 AND role = 'customer' LIMIT 1`, [phone]);
         if (custResult.rows.length > 0) {
             customer = custResult.rows[0];
         } else {
             // Create new customer
             const insert = await db.query(
-                `INSERT INTO customers (phone) VALUES ($1) RETURNING *`, [phone]
+                `INSERT INTO users (phone_number, role) VALUES ($1, 'customer') RETURNING *`, [phone]
             );
             customer = insert.rows[0];
             isNewCustomer = true;
@@ -82,7 +82,7 @@ const verifyOtp = async (req, res) => {
         }
 
         // Sign JWT
-        const token = signCustomerToken({ id: customer.id, phone: customer.phone });
+        const token = signCustomerToken({ id: customer.id, phone: customer.phone_number });
 
         res.status(200).json({
             success: true,
@@ -90,8 +90,8 @@ const verifyOtp = async (req, res) => {
             isNewCustomer,
             customer: {
                 id: customer.id,
-                phone: customer.phone,
-                name: customer.name,
+                phone: customer.phone_number,
+                name: customer.full_name,
                 email: customer.email,
                 address: customer.address
             }
@@ -105,8 +105,8 @@ const verifyOtp = async (req, res) => {
 const getMe = async (req, res) => {
     try {
         const result = await db.query(`
-            SELECT id, phone, name, email, address, is_active 
-            FROM customers WHERE id = $1
+            SELECT id, phone_number AS phone, full_name AS name, email, address, is_active 
+            FROM users WHERE id = $1 AND role = 'customer'
         `, [req.customer.id]);
 
         if (result.rows.length === 0) return res.status(404).json({ success: false, message: "Customer not found" });
