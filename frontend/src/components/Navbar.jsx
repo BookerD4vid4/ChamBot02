@@ -71,7 +71,10 @@ const Navbar = () => {
                         {/* Auth */}
                         {user ? (
                             <div className="user-menu">
-                                <span className="user-name">{user.phone}</span>
+                                <Link to="/profile" className="user-name-link" title="โปรไฟล์">
+                                    <User size={14} />
+                                    <span>{user.full_name || user.phone || user.phone_number}</span>
+                                </Link>
                                 <button className="icon-btn" onClick={logout} title="ออกจากระบบ">
                                     <LogOut size={18} />
                                 </button>
@@ -110,9 +113,13 @@ const Navbar = () => {
                             <Link to="/login" className="mobile-nav-link" onClick={() => setMenuOpen(false)}>เข้าสู่ระบบ</Link>
                         )}
                         {user && (
-                            <button className="mobile-nav-link mobile-logout" onClick={() => { logout(); setMenuOpen(false); }}>
-                                ออกจากระบบ
-                            </button>
+                            <>
+                                <Link to="/profile" className="mobile-nav-link" onClick={() => setMenuOpen(false)}>โปรไฟล์</Link>
+                                <Link to="/my-orders" className="mobile-nav-link" onClick={() => setMenuOpen(false)}>คำสั่งซื้อของฉัน</Link>
+                                <button className="mobile-nav-link mobile-logout" onClick={() => { logout(); setMenuOpen(false); }}>
+                                    ออกจากระบบ
+                                </button>
+                            </>
                         )}
                     </div>
                 )}

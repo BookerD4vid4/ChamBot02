@@ -4,6 +4,7 @@ import { getProducts, getCategories, createProduct, updateProduct, deleteProduct
 import API from '../../api';
 import ProductImage from '../../components/ProductImage';
 import toast from 'react-hot-toast';
+import { useAdmin } from './AdminLayout';
 import './ProductsPage.css';
 
 const formatPrice = (p) =>
@@ -75,6 +76,9 @@ const ProductsPage = () => {
     const [ocrSaving, setOcrSaving] = useState(false);
     const [ocrDragOver, setOcrDragOver] = useState(false);
     const ocrFileRef = useRef();
+    
+    // Fetch function from AdminContext to trigger badge updates if stock changes
+    const { fetchLowStock } = useAdmin();
 
     const fetchAll = async () => {
         setLoading(true);
@@ -137,6 +141,7 @@ const ProductsPage = () => {
                 v.variant_id === variantId ? { ...v, low_stock_threshold: newValue } : v
             )
         }));
+        fetchLowStock();
     };
 
     const openAdd = () => {
@@ -164,6 +169,7 @@ const ProductsPage = () => {
             await deleteProduct(id);
             toast.success('ลบสินค้าสำเร็จ');
             fetchAll();
+            fetchLowStock();
         } catch { toast.error('เกิดข้อผิดพลาด'); }
     };
 
@@ -207,6 +213,7 @@ const ProductsPage = () => {
             // Reset form to empty draft only after successful save
             setForm(emptyProduct());
             fetchAll();
+            fetchLowStock();
         } catch { toast.error('เกิดข้อผิดพลาด กรุณาลองใหม่'); }
         finally { setSaving(false); }
     };
@@ -274,8 +281,8 @@ const ProductsPage = () => {
             setOcrSaveResults(prev => ({ ...prev, done: prev.done + 1, success, failed }));
         }
         setOcrSaving(false);
-        if (failed === 0) { toast.success(`บันทึกสำเร็จทั้งหมด ${success} รายการ! 🎉`); fetchAll(); }
-        else { toast(`บันทึกสำเร็จ ${success} รายการ, ล้มเหลว ${failed} รายการ`, { icon: '⚠️' }); fetchAll(); }
+        if (failed === 0) { toast.success(`บันทึกสำเร็จทั้งหมด ${success} รายการ! 🎉`); fetchAll(); fetchLowStock(); }
+        else { toast(`บันทึกสำเร็จ ${success} รายการ, ล้มเหลว ${failed} รายการ`, { icon: '⚠️' }); fetchAll(); fetchLowStock(); }
     };
 
     const ocrReset = () => {

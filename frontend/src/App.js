@@ -21,6 +21,7 @@ import LoginPage from './pages/LoginPage';
 import MyOrdersPage from './pages/MyOrdersPage';
 import OrderTrackPage from './pages/OrderTrackPage';
 import ProfileSetupPage from './pages/ProfileSetupPage';
+import CustomerProfilePage from './pages/CustomerProfilePage';
 import SuspendedPage from './pages/SuspendedPage';
 
 // Admin Pages
@@ -34,6 +35,9 @@ import StockPage from './pages/admin/StockPage';
 import ReportPage from './pages/admin/ReportPage';
 import MembersPage from './pages/admin/MembersPage';
 
+// Chatbot
+import ChatbotWidget from './components/ChatbotWidget';
+
 // CSS
 import './index.css';
 import './pages/admin/ProductsPage.css';
@@ -45,6 +49,7 @@ const CustomerLayout = ({ children }) => (
     <Navbar />
     <main>{children}</main>
     <Footer />
+    <ChatbotWidget />
   </>
 );
 
@@ -83,6 +88,7 @@ function App() {
             <Route path="/order-success" element={<CustomerLayout><OrderSuccessPage /></CustomerLayout>} />
             <Route path="/my-orders" element={<CustomerLayout><MyOrdersPage /></CustomerLayout>} />
             <Route path="/orders/:id/track" element={<CustomerLayout><OrderTrackPage /></CustomerLayout>} />
+            <Route path="/profile" element={<CustomerLayout><CustomerProfilePage /></CustomerLayout>} />
             <Route path="/profile-setup" element={<ProfileSetupPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/suspended" element={<SuspendedPage />} />

@@ -1,71 +1,117 @@
 # Chambot E-Commerce System
 
-ระบบจัดการร้านค้าออนไลน์ (E-commerce) ครบวงจร พร้อมแดชบอร์ดผู้ดูแลระบบสไตล์โมเดิร์น เชื่อมต่อกับ Supabase PostgreSQL และรองรับการนำเข้าข้อมูลด้วย OCR
-
-## 🚀 คุณสมบัติเด่น (Features)
-- **Admin Dashboard**: แดชบอร์ดมืดดีไซน์พรีเมียม (Dark Theme) พร้อมกราฟรายได้และสถิติเรียลไทม์
-- **Product & Stock Management**: ระบบจัดการสินค้าและสต็อกแบบ MVC พร้อม Inventory Transactions และแจ้งเตือนสินค้าใกล้หมด
-- **Order Tracking**: ระบบติดตามสถานะคำสั่งซื้อแบบ Pipeline
-- **Member Management**: ระงับ/เปิดใช้บัญชีสมาชิก, เพิ่มผู้ดูแลด้วยระบบ Dual OTP
-- **Semantic Search**: ค้นหาสินค้าด้วย AI Embedding (`intfloat/multilingual-e5-small`, 384 มิติ)
-- **OCR Import**: นำเข้าข้อมูลสินค้าจากรูปภาพใบเสร็จอัตโนมัติ
-- **System Architecture**: [แผนผังการทำงานและการไหลของข้อมูล](FLOWCHARTS.md)
+ระบบ E-Commerce ครบวงจร พร้อม AI Chatbot ผู้ช่วยช้อปปิ้ง, Admin Dashboard, และระบบชำระเงิน
+รองรับทั้ง Admin และลูกค้า (Customer Storefront) เชื่อมต่อกับ Supabase PostgreSQL + pgvector
 
 ---
 
-## 🛠️ ขั้นตอนการติดตั้ง (Installation)
+## คุณสมบัติหลัก
 
-### 1. เตรียมฐานข้อมูล (Supabase Setup)
-1. สมัครใช้งานที่ [Supabase](https://supabase.com/) แล้วสร้าง Project ใหม่
-2. ไปที่ **SQL Editor** → กด **New Query**
-3. เปิดไฟล์ `backend/SETUP.sql` → คัดลอกทั้งหมด → วางใน SQL Editor → กด **Run**
+| Feature | รายละเอียด |
+|---------|-----------|
+| **Admin Dashboard** | Dark Theme, กราฟรายได้, สถิติเรียลไทม์ |
+| **Product & Stock Management** | จัดการสินค้า, variant, สต็อก, แจ้งเตือนสินค้าใกล้หมด |
+| **Order Management** | Pipeline สถานะ pending → shipping → completed / cancelled |
+| **Member Management** | ระงับ/เปิดบัญชี, เพิ่ม admin ด้วย Dual OTP |
+| **Customer Storefront** | หน้าร้านค้า, ตะกร้า, checkout, ติดตามพัสดุ |
+| **Customer Auth** | OTP login ผ่านเบอร์โทร |
+| **AI Chatbot** | Typhoon 2.5 LLM + Tool Calling: ค้นหาสินค้า, เพิ่มตะกร้า, checkout ผ่านแชท |
+| **Semantic Search** | pgvector + Gemini Embedding (`gemini-embedding-001`, 768 มิติ) |
+| **Payment** | PromptPay QR (Omise) + เก็บเงินปลายทาง (COD) |
 
-> ไฟล์เดียวนี้ครอบคลุมทั้งหมด: ตาราง, View, Index, Extension (pgvector), และ Function สำหรับ semantic search
+---
+
+## การติดตั้ง (Setup)
+
+### 1. เตรียมฐานข้อมูล (Supabase)
+
+1. สมัครที่ [supabase.com](https://supabase.com/) แล้วสร้าง Project ใหม่
+2. ไปที่ **SQL Editor → New Query**
+3. เปิดไฟล์ `backend/SETUP.sql` → คัดลอกทั้งหมด → วาง → กด **Run**
+
+> ไฟล์เดียวครอบคลุมทุกอย่าง: Extensions, ENUMs, Tables (14 ตาราง), Indexes, Views, Functions
 
 ### 2. ตั้งค่า Backend
-1. เปิดโฟลเดอร์ `backend/` แล้วสร้างไฟล์ `.env`:
-   ```env
-   PORT=5000
-   DATABASE_URL=postgresql://postgres.[PROJECT-REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres
-   JWT_SECRET=your_random_secret_key_here
-   GROQ_API_KEY=your_groq_api_key_here
-   ```
-   > `DATABASE_URL` หาได้จาก Supabase → **Settings → Database → Connection String → Transaction pooler**
 
-2. ติดตั้ง Dependencies และเริ่ม Server:
-   ```bash
-   npm install
-   npm run dev
-   ```
+สร้างไฟล์ `backend/.env`:
+
+```env
+PORT=5000
+DATABASE_URL=postgresql://postgres.[PROJECT-REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres
+
+JWT_SECRET=your_random_secret_key_here
+CUSTOMER_JWT_SECRET=your_customer_secret_here
+
+GEMINI_API_KEY=your_gemini_api_key_here
+GEMINI_EMBEDDING_MODEL=gemini-embedding-001
+
+TYPHOON_API_KEY=your_typhoon_api_key_here
+TYPHOON_API_URL=https://api.opentyphoon.ai/v1
+
+OMISE_PUBLIC_KEY=pkey_test_xxx
+OMISE_SECRET_KEY=skey_test_xxx
+OMISE_WEBHOOK_SECRET=
+
+DEMO_MODE=true
+```
+
+> `DATABASE_URL` หาได้จาก Supabase → **Settings → Database → Connection String → Transaction pooler**
+> `GEMINI_API_KEY` — [Google AI Studio](https://aistudio.google.com/)
+> `TYPHOON_API_KEY` — [opentyphoon.ai](https://opentyphoon.ai/)
+> `OMISE_SECRET_KEY` — [dashboard.omise.co](https://dashboard.omise.co/) (ใช้ test key ก่อน)
+
+ติดตั้งและรัน:
+
+```bash
+cd backend
+npm install
+npm run dev
+```
 
 ### 3. ตั้งค่า Frontend
-1. เปิดโฟลเดอร์ `frontend/` แล้วรัน:
-   ```bash
-   npm install
-   npm start
-   ```
+
+```bash
+cd frontend
+npm install
+npm start
+```
 
 ---
 
-## 📦 ข้อมูลตัวอย่าง (Sample Data)
-หากต้องการใส่ข้อมูลทดสอบ ให้รัน `backend/SAMPLE_ORDERS.sql` ใน SQL Editor ต่อจาก SETUP.sql
+## ข้อมูลตัวอย่าง (Optional)
+
+หากต้องการ seed data สำหรับทดสอบ ให้รัน `backend/SAMPLE_ORDERS.sql` ใน SQL Editor **ต่อจาก** SETUP.sql
 
 ---
 
-## 📁 โครงสร้างไฟล์ SQL
+## โครงสร้างไฟล์ SQL
 
-| ไฟล์ | คำอธิบาย |
-|------|-----------|
-| `SETUP.sql` ⭐ | **รัน SQL เพียงไฟล์นี้ไฟล์เดียว** — ครอบคลุมทุก Schema |
-| `SAMPLE_ORDERS.sql` | ข้อมูลทดสอบ (ไม่บังคับ) |
-| `SCHEMA.sql` | (Legacy) Schema ต้นฉบับ, แทนที่โดย SETUP.sql |
-| `MIGRATION.sql` | (Legacy) Migration order tracking, รวมใน SETUP.sql แล้ว |
-| `CREATE_VIEWS.sql` | (Legacy) Views, รวมใน SETUP.sql แล้ว |
-| `MEMBER_MANAGEMENT_MIGRATION.sql` | (Legacy) Member columns, รวมใน SETUP.sql แล้ว |
-| `EMBEDDING_MIGRATION.sql` | (Legacy) Vector columns, รวมใน SETUP.sql แล้ว |
+| ไฟล์ | สถานะ | คำอธิบาย |
+|------|-------|-----------|
+| `SETUP.sql` | ✅ ใช้งาน | **รันไฟล์เดียวนี้เพื่อ setup ทั้งหมด** |
+| `SAMPLE_ORDERS.sql` | ✅ Optional | Seed data 10 orders สำหรับทดสอบ |
 
 ---
 
-## 👥 ติดต่อ (Contact)
-หากพบปัญหาหรือต้องการคำแนะนำเพิ่มเติม สามารถสอบถามผ่านทาง GitHub Issues ได้เลยครับ!
+## สถานะ Order
 
+| DB Value | ความหมาย | ขั้นตอนถัดไป |
+|----------|---------|-------------|
+| `pending` | รอยืนยัน | → shipping หรือ cancelled |
+| `shipping` | กำลังจัดส่ง | → completed หรือ cancelled |
+| `completed` | จัดส่งสำเร็จ | (สิ้นสุด) |
+| `cancelled` | ยกเลิกออร์เดอร์ | (สิ้นสุด) |
+
+---
+
+## ENV Variables สำคัญ
+
+| Variable | ต้องการ | หมายเหตุ |
+|----------|---------|---------|
+| `DATABASE_URL` | ✅ | Supabase Transaction Pooler (port 6543) |
+| `JWT_SECRET` | ✅ | Admin/Member token |
+| `CUSTOMER_JWT_SECRET` | ✅ | Customer token (ควรเปลี่ยนก่อน production) |
+| `GEMINI_API_KEY` | ✅ | สำหรับ product embedding + search |
+| `TYPHOON_API_KEY` | ✅ | สำหรับ AI Chatbot |
+| `OMISE_SECRET_KEY` | ⚠️ | ต้องใส่ key จริงก่อน go live |
+| `DEMO_MODE` | — | `true` = PromptPay ข้ามการตรวจสอบจริง |

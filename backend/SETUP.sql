@@ -22,7 +22,8 @@ DO $$ BEGIN
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
-    CREATE TYPE order_status AS ENUM ('pending','confirmed','shipped','delivered','cancelled');
+    -- 4 สถานะ: pending → shipping → completed (หรือ cancelled)
+    CREATE TYPE order_status AS ENUM ('pending','shipping','completed','cancelled');
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
@@ -51,6 +52,8 @@ CREATE TABLE IF NOT EXISTS public.users (
     id              INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     phone_number    VARCHAR(20) NOT NULL UNIQUE,
     full_name       VARCHAR(255),
+    email           VARCHAR(255),
+    address         TEXT,
     role            user_role NOT NULL DEFAULT 'customer',
     is_active       BOOLEAN DEFAULT true,
     suspended_by    INT REFERENCES public.users(id) ON DELETE SET NULL,
@@ -67,6 +70,7 @@ CREATE TABLE IF NOT EXISTS public.user_addresses (
     address_line    TEXT NOT NULL,
     province        VARCHAR(150),
     postal_code     VARCHAR(20),
+    is_default      BOOLEAN DEFAULT false,
     created_at      TIMESTAMPTZ DEFAULT now()
 );
 
@@ -196,6 +200,25 @@ CREATE TABLE IF NOT EXISTS public.product_embeddings (
     embedding   vector(384) NOT NULL,
     text_used   TEXT,
     updated_at  TIMESTAMPTZ DEFAULT now()
+);
+
+-- 3.13 CUSTOMER OTPs (สำหรับ OTP login ของลูกค้า)
+CREATE TABLE IF NOT EXISTS public.customer_otps (
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    phone       VARCHAR(20) NOT NULL,
+    otp_code    VARCHAR(6) NOT NULL,
+    expires_at  TIMESTAMPTZ NOT NULL,
+    used        BOOLEAN DEFAULT false,
+    created_at  TIMESTAMPTZ DEFAULT now()
+);
+
+-- 3.14 PAYMENT WEBHOOKS (สำหรับ log webhook จาก Omise)
+CREATE TABLE IF NOT EXISTS public.payment_webhooks (
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    event_type  VARCHAR(100),
+    payload     JSONB,
+    processed   BOOLEAN DEFAULT false,
+    created_at  TIMESTAMPTZ DEFAULT now()
 );
 
 

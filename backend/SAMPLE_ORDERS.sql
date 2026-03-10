@@ -1,8 +1,9 @@
 -- =====================================================================
 -- CHAMBOT — SAMPLE ORDERS SEED DATA (10 คำสั่งซื้อตัวอย่าง)
--- Compatible with SCHEMA.sql + MIGRATION.sql
--- ENUMs: user_role, order_status, payment_status, payment_method,
---        shipment_status, inventory_transaction_type
+-- Compatible with SETUP.sql
+-- order_status ENUM:  pending | shipping | completed | cancelled
+-- payment_status ENUM: pending | paid | failed | refunded
+-- shipment_status ENUM: preparing | shipped | delivered | returned
 -- =====================================================================
 
 -- ── 1. Users ─────────────────────────────────────────────────────────
@@ -124,27 +125,23 @@ BEGIN
   SELECT address_id INTO a9  FROM user_addresses WHERE user_id=u9  LIMIT 1;
   SELECT address_id INTO a10 FROM user_addresses WHERE user_id=u10 LIMIT 1;
 
-  -- ── ORDER 1: สมชาย — กาแฟ 2 ถุง → delivered / paid (55 วันที่แล้ว)
-  -- order_status: 'delivered'  payment_status: 'paid'
+  -- ── ORDER 1: สมชาย — กาแฟ 2 ถุง → completed / paid (55 วันที่แล้ว)
   INSERT INTO orders (user_id,total_amount,status,payment_status,created_at,updated_at)
-    VALUES (u2, 700.00,'delivered','paid', NOW()-'55 days'::interval, NOW()-'53 days'::interval)
+    VALUES (u2, 700.00,'completed','paid', NOW()-'55 days'::interval, NOW()-'53 days'::interval)
     RETURNING order_id INTO o1;
   INSERT INTO order_items(order_id,variant_id,price,quantity) VALUES(o1,v1,350.00,2);
-  -- payment_method: 'qr'  payment_status: 'paid'
   INSERT INTO payments(order_id,method,status,paid_at)
     VALUES(o1,'qr','paid', NOW()-'55 days'::interval);
-  -- shipment_status: 'delivered'
   INSERT INTO shipments(order_id,address_id,status,tracking_number,shipped_at)
     VALUES(o1,a2,'delivered','TH-001-SAMPLE', NOW()-'54 days'::interval);
   INSERT INTO order_status_logs(order_id,status,changed_by,note) VALUES
     (o1,'pending',  'system','Order created'),
-    (o1,'confirmed','admin', 'Payment verified via QR'),
-    (o1,'shipped',  'admin', 'Dispatched via Thailand Post'),
-    (o1,'delivered','system','Parcel delivered');
+    (o1,'shipping', 'admin', 'Dispatched via Thailand Post'),
+    (o1,'completed','system','Parcel delivered');
 
-  -- ── ORDER 2: สมศักดิ์ — ชาเขียว 1 กล่อง → shipped / paid (40 วัน)
+  -- ── ORDER 2: สมศักดิ์ — ชาเขียว 1 กล่อง → shipping / paid (40 วัน)
   INSERT INTO orders (user_id,total_amount,status,payment_status,created_at,updated_at)
-    VALUES (u3, 180.00,'shipped','paid', NOW()-'40 days'::interval, NOW()-'38 days'::interval)
+    VALUES (u3, 180.00,'shipping','paid', NOW()-'40 days'::interval, NOW()-'38 days'::interval)
     RETURNING order_id INTO o2;
   INSERT INTO order_items(order_id,variant_id,price,quantity) VALUES(o2,v2,180.00,1);
   INSERT INTO payments(order_id,method,status,paid_at)
@@ -152,21 +149,19 @@ BEGIN
   INSERT INTO shipments(order_id,address_id,status,tracking_number,shipped_at)
     VALUES(o2,a3,'shipped','KEX-002-SAMPLE', NOW()-'38 days'::interval);
   INSERT INTO order_status_logs(order_id,status,changed_by,note) VALUES
-    (o2,'pending',  'system','Order created'),
-    (o2,'confirmed','admin', 'QR payment confirmed'),
-    (o2,'shipped',  'admin', 'In transit via Kerry');
+    (o2,'pending', 'system','Order created'),
+    (o2,'shipping','admin', 'In transit via Kerry');
 
-  -- ── ORDER 3: มาลี — Drip Kettle 1 → confirmed / paid (30 วัน)
+  -- ── ORDER 3: มาลี — Drip Kettle 1 → pending / paid (30 วัน)
   INSERT INTO orders (user_id,total_amount,status,payment_status,created_at,updated_at)
-    VALUES (u4, 1200.00,'confirmed','paid', NOW()-'30 days'::interval, NOW()-'29 days'::interval)
+    VALUES (u4, 1200.00,'pending','paid', NOW()-'30 days'::interval, NOW()-'29 days'::interval)
     RETURNING order_id INTO o3;
   INSERT INTO order_items(order_id,variant_id,price,quantity) VALUES(o3,v3,1200.00,1);
   INSERT INTO payments(order_id,method,status,paid_at)
     VALUES(o3,'qr','paid', NOW()-'30 days'::interval);
   INSERT INTO shipments(order_id,address_id,status) VALUES(o3,a4,'preparing');
   INSERT INTO order_status_logs(order_id,status,changed_by,note) VALUES
-    (o3,'pending',  'system','Order placed'),
-    (o3,'confirmed','admin', 'QR scanned & verified');
+    (o3,'pending','system','Order placed — QR payment received');
 
   -- ── ORDER 4: เกียรติ — แก้วเซรามิค 1 → pending / pending (COD, 25 วัน)
   INSERT INTO orders (user_id,total_amount,status,payment_status,created_at,updated_at)
@@ -177,9 +172,9 @@ BEGIN
   INSERT INTO order_status_logs(order_id,status,changed_by,note) VALUES
     (o4,'pending','system','COD order — awaiting pickup');
 
-  -- ── ORDER 5: วิภา — เมล็ดพันธุ์ 1 → delivered / paid (20 วัน)
+  -- ── ORDER 5: วิภา — เมล็ดพันธุ์ 1 → completed / paid (20 วัน)
   INSERT INTO orders (user_id,total_amount,status,payment_status,created_at,updated_at)
-    VALUES (u6, 890.00,'delivered','paid', NOW()-'20 days'::interval, NOW()-'17 days'::interval)
+    VALUES (u6, 890.00,'completed','paid', NOW()-'20 days'::interval, NOW()-'17 days'::interval)
     RETURNING order_id INTO o5;
   INSERT INTO order_items(order_id,variant_id,price,quantity) VALUES(o5,v5,890.00,1);
   INSERT INTO payments(order_id,method,status,paid_at)
@@ -187,10 +182,9 @@ BEGIN
   INSERT INTO shipments(order_id,address_id,status,tracking_number,shipped_at)
     VALUES(o5,a6,'delivered','JT-005-SAMPLE', NOW()-'19 days'::interval);
   INSERT INTO order_status_logs(order_id,status,changed_by,note) VALUES
-    (o5,'pending', 'system','Order created'),
-    (o5,'confirmed','admin','Payment verified'),
-    (o5,'shipped', 'admin', 'Out for delivery'),
-    (o5,'delivered','system','Successfully delivered');
+    (o5,'pending',  'system','Order created'),
+    (o5,'shipping', 'admin', 'Out for delivery'),
+    (o5,'completed','system','Successfully delivered');
 
   -- ── ORDER 6: อุดม — ปุ๋ย 2 ถุง → pending / pending (COD, 15 วัน)
   INSERT INTO orders (user_id,total_amount,status,payment_status,created_at,updated_at)
@@ -201,9 +195,9 @@ BEGIN
   INSERT INTO order_status_logs(order_id,status,changed_by,note) VALUES
     (o6,'pending','system','Waiting for COD confirmation');
 
-  -- ── ORDER 7: พัชรา — เครื่องสีข้าว 1 → delivered / paid (12 วัน)
+  -- ── ORDER 7: พัชรา — เครื่องสีข้าว 1 → completed / paid (12 วัน)
   INSERT INTO orders (user_id,total_amount,status,payment_status,created_at,updated_at)
-    VALUES (u8, 15500.00,'delivered','paid', NOW()-'12 days'::interval, NOW()-'9 days'::interval)
+    VALUES (u8, 15500.00,'completed','paid', NOW()-'12 days'::interval, NOW()-'9 days'::interval)
     RETURNING order_id INTO o7;
   INSERT INTO order_items(order_id,variant_id,price,quantity) VALUES(o7,v7,15500.00,1);
   INSERT INTO payments(order_id,method,status,paid_at)
@@ -211,14 +205,13 @@ BEGIN
   INSERT INTO shipments(order_id,address_id,status,tracking_number,shipped_at)
     VALUES(o7,a8,'delivered','DHL-007-SAMPLE', NOW()-'11 days'::interval);
   INSERT INTO order_status_logs(order_id,status,changed_by,note) VALUES
-    (o7,'pending', 'system','Large order placed'),
-    (o7,'confirmed','admin','QR payment confirmed — high value'),
-    (o7,'shipped', 'admin', 'Dispatched via DHL'),
-    (o7,'delivered','system','Signature obtained');
+    (o7,'pending',  'system','Large order placed'),
+    (o7,'shipping', 'admin', 'Dispatched via DHL'),
+    (o7,'completed','system','Signature obtained');
 
-  -- ── ORDER 8: ณิชา — แยม 3 ขวด → shipped / paid (8 วัน)
+  -- ── ORDER 8: ณิชา — แยม 3 ขวด → shipping / paid (8 วัน)
   INSERT INTO orders (user_id,total_amount,status,payment_status,created_at,updated_at)
-    VALUES (u9, 360.00,'shipped','paid', NOW()-'8 days'::interval, NOW()-'7 days'::interval)
+    VALUES (u9, 360.00,'shipping','paid', NOW()-'8 days'::interval, NOW()-'7 days'::interval)
     RETURNING order_id INTO o8;
   INSERT INTO order_items(order_id,variant_id,price,quantity) VALUES(o8,v8,120.00,3);
   INSERT INTO payments(order_id,method,status,paid_at)
@@ -227,8 +220,7 @@ BEGIN
     VALUES(o8,a9,'shipped','EE-008-SAMPLE', NOW()-'7 days'::interval);
   INSERT INTO order_status_logs(order_id,status,changed_by,note) VALUES
     (o8,'pending', 'system','Order placed'),
-    (o8,'confirmed','admin','Payment received'),
-    (o8,'shipped', 'admin', 'In transit — EMS');
+    (o8,'shipping','admin', 'In transit — EMS');
 
   -- ── ORDER 9: ตะวัน — Barista Course → cancelled / refunded (5 วัน)
   -- payment_status: 'refunded' (valid in SCHEMA enum)
@@ -241,17 +233,16 @@ BEGIN
     (o9,'pending',  'system','Course booking created'),
     (o9,'cancelled','admin', 'Customer requested cancel — refund processed');
 
-  -- ── ORDER 10: สมชาย — Farm Trip 2 ที่ → confirmed / paid (2 วัน)
+  -- ── ORDER 10: สมชาย — Farm Trip 2 ที่ → pending / paid (2 วัน)
   INSERT INTO orders (user_id,total_amount,status,payment_status,created_at,updated_at)
-    VALUES (u2, 3000.00,'confirmed','paid', NOW()-'2 days'::interval, NOW()-'2 days'::interval)
+    VALUES (u2, 3000.00,'pending','paid', NOW()-'2 days'::interval, NOW()-'2 days'::interval)
     RETURNING order_id INTO o10;
   INSERT INTO order_items(order_id,variant_id,price,quantity) VALUES(o10,v10,1500.00,2);
   INSERT INTO payments(order_id,method,status,paid_at)
     VALUES(o10,'qr','paid', NOW()-'2 days'::interval);
   INSERT INTO shipments(order_id,address_id,status) VALUES(o10,a2,'preparing');
   INSERT INTO order_status_logs(order_id,status,changed_by,note) VALUES
-    (o10,'pending',  'system','Trip reservation'),
-    (o10,'confirmed','admin', '2 trip slots confirmed');
+    (o10,'pending','system','Trip reservation — QR payment received');
 
   -- ── 7. Inventory Transactions ─────────────────────────────────────
   -- transaction_type ENUM: 'purchase' | 'restock' | 'adjustment' | 'cancel'

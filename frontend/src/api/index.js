@@ -21,6 +21,21 @@ API.interceptors.request.use((config) => {
     return config;
 });
 
+// Automatically handle stale tokens (e.g., after DB reset)
+API.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        const isAuthError = error.response?.status === 401;
+        const isUserNotFound = error.response?.status === 404 && error.config?.url?.includes('/auth/me');
+        if (isAuthError || isUserNotFound) {
+            localStorage.removeItem('chambot_token');
+            localStorage.removeItem('chambot_user');
+            window.location.href = '/login';
+        }
+        return Promise.reject(error);
+    }
+);
+
 // ─── Products ───────────────────────────────────────────
 export const getProducts = (params = {}) => API.get('/products', { params });
 export const getProductById = (id) => API.get(`/products/${id}`);
@@ -83,6 +98,10 @@ export const requestOtp = (phone) => API.post('/auth/request-otp', { phone });
 export const verifyOtp = (phone, otp) => API.post('/auth/verify-otp', { phone, otp });
 export const getMe = () => API.get('/auth/me');
 export const updateProfile = (data) => API.patch('/auth/profile', data);
+export const getMyAddresses = () => API.get('/auth/addresses');
+export const addMyAddress = (data) => API.post('/auth/addresses', data);
+export const updateMyAddress = (id, data) => API.put(`/auth/addresses/${id}`, data);
+export const deleteMyAddress = (id) => API.delete(`/auth/addresses/${id}`);
 
 // ─── Reports (Admin) ──────────────────────────────────────
 export const getSalesReport = (p = {}) => API.get('/admin/reports/sales', { params: p });
@@ -104,6 +123,16 @@ export const getEmbeddingStatus = () => API.get('/admin/embeddings/status');
 export const checkProductEmbedding = (productId) => API.get(`/admin/embeddings/check/${productId}`);
 export const embedSingleProduct = (productId) => API.post(`/admin/embeddings/embed/${productId}`);
 export const reindexEmbeddings = () => API.post('/admin/embeddings/reindex');
+
+// ─── Chatbot ─────────────────────────────────────────────────────────────────
+export const sendChatMessage = (message, conversationHistory = [], cartItems = [], checkoutAddressId = null) =>
+    API.post('/chatbot/message', { message, conversationHistory, cartItems, checkoutAddressId }, { timeout: 60000 });
+
+// ─── Payment ─────────────────────────────────────────────────────────────────
+export const createPayment = (orderId, method) =>
+    API.post('/payment/create', { orderId, method });
+export const getPaymentStatus = (orderId) =>
+    API.get(`/payment/${orderId}/status`);
 
 export default API;
 

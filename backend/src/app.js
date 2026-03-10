@@ -11,6 +11,9 @@ const orderRoutes = require("./routes/orderRoutes");
 const adminOrderRoutes = require("./routes/adminOrderRoutes");
 const adminUserRoutes = require("./routes/adminUserRoutes");
 const authRoutes = require("./routes/authRoutes");
+const customerAuthRoutes = require("./routes/customerAuthRoutes");
+const paymentRoutes = require("./routes/paymentRoutes");
+const chatbotRoutes = require("./routes/chatbotRoutes");
 const reportRoutes = require("./routes/reportRoutes");
 const uploadController = require("./controllers/uploadController");
 const ocrController = require("./controllers/ocrController");
@@ -29,6 +32,9 @@ app.use("/api/categories", require("./routes/categoryRoutes"));
 app.use("/api/variants", require("./routes/variantRoutes"));
 app.use("/api/orders", require("./routes/orderRoutes"));
 app.use("/api/auth", authRoutes);
+app.use("/api/customer/auth", customerAuthRoutes);
+app.use("/api/payment", paymentRoutes);
+app.use("/api/chatbot", chatbotRoutes);
 
 // Admin Routes (all require requireAdmin middleware via their router files)
 app.use("/api/admin/products", require("./routes/adminProductRoutes"));

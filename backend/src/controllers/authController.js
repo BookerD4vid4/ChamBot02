@@ -99,7 +99,7 @@ const verifyOtp = async (req, res) => {
 const getMe = async (req, res) => {
     try {
         const result = await db.query(
-            "SELECT id, phone_number, full_name, role, is_active FROM users WHERE id = $1", [req.user.id]
+            "SELECT id, phone_number, full_name, address, role, is_active FROM users WHERE id = $1", [req.user.id]
         );
         if (result.rows.length === 0) return res.status(404).json({ success: false, message: "User not found" });
         res.status(200).json({ success: true, user: result.rows[0] });
@@ -110,11 +110,15 @@ const getMe = async (req, res) => {
 
 // ─── PATCH /api/auth/profile ──────────────────────────────────────────────────
 const updateProfile = async (req, res) => {
-    const { full_name } = req.body;
+    const { full_name, address } = req.body;
     try {
         const result = await db.query(
-            "UPDATE users SET full_name = $1 WHERE id = $2 RETURNING *",
-            [full_name, req.user.id]
+            `UPDATE users SET full_name  = COALESCE($1, full_name),
+                              address    = COALESCE($2, address),
+                              updated_at = NOW()
+             WHERE id = $3
+             RETURNING id, phone_number, full_name, address, role, is_active`,
+            [full_name, address, req.user.id]
         );
         res.status(200).json({ success: true, user: result.rows[0] });
     } catch (err) {
@@ -122,4 +126,67 @@ const updateProfile = async (req, res) => {
     }
 };
 
-module.exports = { requestOtp, verifyOtp, getMe, updateProfile };
+// ─── GET  /api/auth/addresses ────────────────────────────────────────────
+const getAddresses = async (req, res) => {
+    try {
+        const { rows } = await db.query(
+            `SELECT address_id, recipient_name, address_line, province, postal_code, created_at
+             FROM user_addresses WHERE user_id = $1 ORDER BY address_id DESC`,
+            [req.user.id]
+        );
+        res.json({ success: true, addresses: rows });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// ─── POST /api/auth/addresses ───────────────────────────────────────────
+const addAddress = async (req, res) => {
+    const { recipient_name, address_line, province, postal_code } = req.body;
+    if (!recipient_name?.trim() || !address_line?.trim())
+        return res.status(400).json({ success: false, message: 'กรุณากรอกชื่อผู้รับและที่อยู่ให้ครบ' });
+    try {
+        const { rows } = await db.query(
+            `INSERT INTO user_addresses (user_id, recipient_name, address_line, province, postal_code)
+             VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+            [req.user.id, recipient_name.trim(), address_line.trim(), (province || '').trim(), (postal_code || '').trim()]
+        );
+        res.status(201).json({ success: true, address: rows[0] });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// ─── PUT  /api/auth/addresses/:id ────────────────────────────────────────
+const updateAddress = async (req, res) => {
+    const { id } = req.params;
+    const { recipient_name, address_line, province, postal_code } = req.body;
+    try {
+        const { rows } = await db.query(
+            `UPDATE user_addresses
+             SET recipient_name=$1, address_line=$2, province=$3, postal_code=$4
+             WHERE address_id=$5 AND user_id=$6 RETURNING *`,
+            [recipient_name, address_line, province || '', postal_code || '', id, req.user.id]
+        );
+        if (!rows.length) return res.status(404).json({ success: false, message: 'ไม่พบที่อยู่นี้' });
+        res.json({ success: true, address: rows[0] });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+// ─── DELETE /api/auth/addresses/:id ─────────────────────────────────────
+const deleteAddress = async (req, res) => {
+    const { id } = req.params;
+    try {
+        await db.query(
+            `DELETE FROM user_addresses WHERE address_id=$1 AND user_id=$2`,
+            [id, req.user.id]
+        );
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+};
+
+module.exports = { requestOtp, verifyOtp, getMe, updateProfile, getAddresses, addAddress, updateAddress, deleteAddress };

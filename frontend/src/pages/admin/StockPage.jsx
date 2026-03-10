@@ -7,6 +7,7 @@ import {
 import { getAllVariants, adjustStock, getCategories, getStockHistory } from '../../api';
 import ProductImage from '../../components/ProductImage';
 import toast from 'react-hot-toast';
+import { useAdmin } from './AdminLayout';
 import './StockPage.css';
 
 /* ─── Helpers ────────────────────────────────────────────── */
@@ -479,6 +480,9 @@ const StockPage = () => {
     const [historyTarget, setHistoryTarget] = useState(null);
     const [selected, setSelected] = useState(new Set());
     const [bulkOpen, setBulkOpen] = useState(false);
+    
+    // Fetch function from AdminContext to trigger badge updates
+    const { fetchLowStock } = useAdmin();
 
     const fetchVariants = useCallback(async () => {
         setLoading(true);
@@ -732,7 +736,7 @@ const StockPage = () => {
                 <AdjustModal
                     variant={adjustTarget}
                     onClose={() => setAdjustTarget(null)}
-                    onSuccess={fetchVariants}
+                    onSuccess={() => { fetchVariants(); fetchLowStock(); }}
                 />
             )}
             {historyTarget && (
@@ -745,7 +749,7 @@ const StockPage = () => {
                 <BulkModal
                     selected={selectedVariants}
                     onClose={() => setBulkOpen(false)}
-                    onSuccess={() => { fetchVariants(); setSelected(new Set()); }}
+                    onSuccess={() => { fetchVariants(); fetchLowStock(); setSelected(new Set()); }}
                 />
             )}
         </div>

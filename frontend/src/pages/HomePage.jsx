@@ -32,7 +32,16 @@ const HomePage = () => {
         { icon: <Star size={24} />, title: 'รีวิวจริง', desc: 'ลูกค้าจริง ความคิดเห็นจริง' },
     ];
 
-    const categoryIcons = ['🍎', '👕', '💻', '🏠', '🎮', '📚', '🌿', '🎨'];
+    const CATEGORY_ICONS = {
+        'เครื่องดื่ม':              '🥤',
+        'อาหารแห้งและเครื่องปรุง':  '🌾',
+        'ขนมขบเคี้ยว':              '🍿',
+        'ของใช้ส่วนตัว':            '🧴',
+        'ผลิตภัณฑ์ทำความสะอาด':    '🧹',
+        'ยาสามัญประจำบ้าน':         '💊',
+        'สินค้าเบ็ดเตล็ด':          '🛍️',
+        'ของสดและอื่นๆ':            '🥬',
+    };
 
     return (
         <div className="home-page">
@@ -98,9 +107,9 @@ const HomePage = () => {
                             <Link to="/shop" className="section-link">ดูทั้งหมด <ArrowRight size={14} /></Link>
                         </div>
                         <div className="categories-grid">
-                            {categories.slice(0, 8).map((cat, i) => (
+                            {categories.slice(0, 8).map((cat) => (
                                 <Link key={cat.category_id} to={`/shop?category=${cat.category_id}`} className="category-chip">
-                                    <span className="category-chip-icon">{categoryIcons[i % categoryIcons.length]}</span>
+                                    <span className="category-chip-icon">{CATEGORY_ICONS[cat.name] || '🛒'}</span>
                                     <span>{cat.name}</span>
                                 </Link>
                             ))}

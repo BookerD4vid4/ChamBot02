@@ -16,7 +16,7 @@ export const CartProvider = ({ children }) => {
         localStorage.setItem('chambot_cart', JSON.stringify(items));
     }, [items]);
 
-    const addItem = (product, variant, quantity = 1) => {
+    const addItem = (product, variant, quantity = 1, silent = false) => {
         setItems(prev => {
             const key = `${product.product_id}-${variant.variant_id}`;
             const existing = prev.find(i => i.key === key);
@@ -35,7 +35,7 @@ export const CartProvider = ({ children }) => {
                 quantity,
             }];
         });
-        setIsOpen(true);
+        if (!silent) setIsOpen(true);
     };
 
     const removeItem = (key) => {

@@ -7,13 +7,10 @@ import './MyOrdersPage.css';
 const API = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 const STATUS_CONFIG = {
-    pending: { label: 'รอดำเนินการ', color: '#f59e0b', bg: '#fef3c7' },
-    paid: { label: 'ชำระแล้ว', color: '#3b82f6', bg: '#dbeafe' },
-    processing: { label: 'กำลังเตรียม', color: '#8b5cf6', bg: '#ede9fe' },
-    shipped: { label: 'จัดส่งแล้ว', color: '#06b6d4', bg: '#cffafe' },
-    delivered: { label: 'ส่งถึงแล้ว', color: '#10b981', bg: '#d1fae5' },
-    cancelled: { label: 'ยกเลิก', color: '#ef4444', bg: '#fee2e2' },
-    refunded: { label: 'คืนเงินแล้ว', color: '#6b7280', bg: '#f3f4f6' },
+    pending:   { label: 'รอยืนยัน',        color: '#f59e0b', bg: '#fef3c7' },
+    shipping:  { label: 'กำลังจัดส่ง',     color: '#a855f7', bg: '#f3e8ff' },
+    completed: { label: 'จัดส่งสำเร็จ',    color: '#10b981', bg: '#d1fae5' },
+    cancelled: { label: 'ยกเลิกออร์เดอร์', color: '#ef4444', bg: '#fee2e2' },
 };
 
 const StatusBadge = ({ status }) => {

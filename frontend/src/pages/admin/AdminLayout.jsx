@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, createContext, useContext } from 'react';
 import { NavLink, Outlet, Navigate, useLocation } from 'react-router-dom';
 import {
     LayoutDashboard, Package, Tag, ShoppingBag, Home, LogOut,
@@ -8,26 +8,29 @@ import { useAuth } from '../../context/AuthContext';
 import { getLowStockProducts } from '../../api';
 import './AdminLayout.css';
 
+export const AdminContext = createContext();
+export const useAdmin = () => useContext(AdminContext);
+
 const AdminLayout = () => {
     const { user, isAdmin, logout } = useAuth();
     const [lowStockCount, setLowStockCount] = useState(0);
     const location = useLocation();
 
+    const fetchLowStock = async () => {
+        try {
+            const res = await getLowStockProducts();
+            setLowStockCount(res.data.data?.length || 0);
+        } catch (err) {
+            console.error("Failed to fetch low stock count:", err);
+        }
+    };
+
     useEffect(() => {
-        const fetchLowStock = async () => {
-            try {
-                const res = await getLowStockProducts();
-                setLowStockCount(res.data.data?.length || 0);
-            } catch (err) {
-                console.error("Failed to fetch low stock count:", err);
-            }
-        };
         if (isAdmin) {
             fetchLowStock();
-            const interval = setInterval(fetchLowStock, 60000);
-            return () => clearInterval(interval);
+            // Removed setInterval to comply with strictly cost-optimized and no-polling rules
         }
-    }, [isAdmin]);
+    }, [isAdmin, location.pathname]);
 
     if (!isAdmin) return <Navigate to="/login" replace />;
 
@@ -76,9 +79,10 @@ const AdminLayout = () => {
     };
 
     return (
-        <div className="admin-layout">
-            {/* Sidebar */}
-            <aside className="admin-sidebar">
+        <AdminContext.Provider value={{ fetchLowStock, lowStockCount }}>
+            <div className="admin-layout">
+                {/* Sidebar */}
+                <aside className="admin-sidebar">
                 <div className="admin-sidebar-logo">
                     <div className="logo-icon">
                         <Store size={18} />
@@ -156,6 +160,7 @@ const AdminLayout = () => {
                 </div>
             </main>
         </div>
+        </AdminContext.Provider>
     );
 };
 

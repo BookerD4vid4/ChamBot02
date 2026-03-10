@@ -2,10 +2,11 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
     Search, RefreshCw, X, Phone, MapPin, ShoppingBag,
     ChevronRight, CheckCircle2, Truck, Clock, XCircle,
-    Calendar, Filter, Package, MessageSquare
+    Calendar
 } from 'lucide-react';
 import { getAdminOrders, getAdminOrderById, updateOrderStatus } from '../../api';
 import toast from 'react-hot-toast';
+import { useAdmin } from './AdminLayout';
 import './OrdersPage.css';
 
 const fmtPrice = (p) =>
@@ -18,24 +19,20 @@ const fmtDate = (d) => {
 
 // ─── Status definitions (matches order_status ENUM in SCHEMA.sql) ───────────
 const STATUS = {
-    pending:   { th: 'รอยืนยัน',         color: '#f59e0b', bg: 'rgba(245,158,11,0.12)',   icon: <Clock size={13} /> },
-    shipped:   { th: 'กำลังจัดส่ง 🛵',   color: '#a855f7', bg: 'rgba(168,85,247,0.12)',   icon: <Truck size={13} /> },
-    delivered: { th: 'ส่งถึงแล้ว ✅',    color: '#10b981', bg: 'rgba(16,185,129,0.12)',  icon: <CheckCircle2 size={13} /> },
-    cancelled: { th: 'ยกเลิก',           color: '#ef4444', bg: 'rgba(239,68,68,0.1)',     icon: <XCircle size={13} /> },
+    pending:   { th: 'รอยืนยัน',        color: '#f59e0b', bg: 'rgba(245,158,11,0.12)',  icon: <Clock size={13} /> },
+    shipping:  { th: 'กำลังจัดส่ง',     color: '#a855f7', bg: 'rgba(168,85,247,0.12)',  icon: <Truck size={13} /> },
+    completed: { th: 'จัดส่งสำเร็จ',    color: '#10b981', bg: 'rgba(16,185,129,0.12)', icon: <CheckCircle2 size={13} /> },
+    cancelled: { th: 'ยกเลิกออร์เดอร์', color: '#ef4444', bg: 'rgba(239,68,68,0.1)',   icon: <XCircle size={13} /> },
 };
 
-// Workflow: pending → shipped → delivered
-//           pending → cancelled (requires note)
+// All changeable statuses for admin dropdown
+const CHANGEABLE_STATUSES = ['pending', 'shipping', 'completed', 'cancelled'];
+
+// Quick card actions (simplified for card view only)
 const QUICK_NEXT = {
-    pending: [
-        { to: 'shipped',   label: '✅ ยืนยัน / จัดส่ง', primary: true },
-        { to: 'cancelled', label: '✖ ยกเลิก', primary: false, requireNote: true },
-    ],
-    shipped: [
-        { to: 'delivered', label: '✅ ส่งถึงแล้ว', primary: true },
-        { to: 'cancelled', label: '✖ ยกเลิกการจัดส่ง', primary: false, requireNote: true },
-    ],
-    delivered: [],
+    pending:   [{ to: 'shipping',  label: '🛵 จัดส่ง',       primary: true }],
+    shipping:  [{ to: 'completed', label: '✅ จัดส่งสำเร็จ', primary: true }],
+    completed: [],
     cancelled: [],
 };
 
@@ -96,7 +93,6 @@ function OrderDrawer({ orderId, onClose, onUpdated, focusNote = false }) {
     };
 
     const d = detail;
-    const nextActions = QUICK_NEXT[d?.status] || [];
     const address = d?.shipment?.address_line || d?.shipment?.recipient_name || '—';
     const recipientName = d?.shipment?.recipient_name;
 
@@ -183,47 +179,56 @@ function OrderDrawer({ orderId, onClose, onUpdated, focusNote = false }) {
                             </div>
                         )}
 
-                        {/* ── Quick Actions ── */}
-                        {nextActions.length > 0 && (
+                        {/* ── Status Update (Free Dropdown) ── */}
+                        {d.status === 'delivered' ? (
+                            <div className="ord-section" style={{ textAlign: 'center', padding: '16px', background: 'rgba(16,185,129,0.07)', borderRadius: 10, border: '1px solid rgba(16,185,129,0.2)' }}>
+                                <CheckCircle2 size={20} style={{ color: '#10b981', marginBottom: 4 }} />
+                                <div style={{ color: '#10b981', fontWeight: 600 }}>ส่งถึงปลายทางแล้ว</div>
+                                <div style={{ color: 'var(--text-muted)', fontSize: 12, marginTop: 4 }}>ไม่สามารถเปลี่ยนสถานะได้อีก</div>
+                            </div>
+                        ) : (
                             <div className="ord-section ord-actions-section">
-                                <div className="ord-section-title"><ChevronRight size={14} /> อัปเดตสถานะ</div>
-
-                                {/* Show note input: always for cancel, optional otherwise */}
+                                <div className="ord-section-title"><ChevronRight size={14} /> เปลี่ยนสถานะ (Admin)</div>
+                                <select
+                                    className="input-field"
+                                    style={{ marginBottom: 10, fontSize: 13 }}
+                                    value={updating || d.status}
+                                    disabled={!!updating}
+                                    onChange={e => {
+                                        const newStatus = e.target.value;
+                                        if (newStatus === d.status) return;
+                                        if (newStatus === 'cancelled' && !note.trim()) {
+                                            toast.error('กรุณาระบุหมายเหตุการยกเลิกด้านล่างก่อน');
+                                            noteRef.current?.focus();
+                                            return;
+                                        }
+                                        doUpdate(newStatus, newStatus === 'cancelled');
+                                    }}
+                                >
+                                    {CHANGEABLE_STATUSES.map(s => (
+                                        <option key={s} value={s}>
+                                            {STATUS[s]?.th || s}
+                                        </option>
+                                    ))}
+                                </select>
                                 <input
                                     ref={noteRef}
                                     className="input-field"
-                                    style={{
-                                        marginBottom: 10, fontSize: 13,
-                                        ...(focusNote ? {
-                                            borderColor: 'rgba(239,68,68,0.7)',
-                                            boxShadow: '0 0 0 3px rgba(239,68,68,0.15)',
-                                            animation: 'pulse 1.5s ease-in-out 2',
-                                        } : {})
-                                    }}
-                                    placeholder={
-                                        nextActions.some(a => a.requireNote)
-                                            ? '⚠️ กรุณาระบุหมายเหตุการยกเลิก (จำเป็น)'
-                                            : 'หมายเหตุ (ไม่บังคับ)'
-                                    }
+                                    style={{ marginBottom: 10, fontSize: 13 }}
+                                    placeholder="หมายเหตุ (บังคับสำหรับการยกเลิก)"
                                     value={note}
                                     onChange={e => setNote(e.target.value)}
                                 />
                                 <div className="ord-action-btns">
-                                    {nextActions.map(act => (
-                                        <button
-                                            key={act.to}
-                                            className={`btn ${act.to === 'cancelled'
-                                                ? 'btn-danger'
-                                                : act.primary ? 'btn-primary' : 'btn-secondary'
-                                                } ord-action-btn`}
-                                            onClick={() => doUpdate(act.to, act.requireNote)}
-                                            disabled={!!updating}
-                                        >
-                                            {updating === act.to
-                                                ? <div className="spinner" style={{ width: 16, height: 16 }} />
-                                                : act.label}
-                                        </button>
-                                    ))}
+                                    <button
+                                        className="btn btn-danger ord-action-btn"
+                                        onClick={() => doUpdate('cancelled', true)}
+                                        disabled={!!updating}
+                                    >
+                                        {updating === 'cancelled'
+                                            ? <div className="spinner" style={{ width: 16, height: 16 }} />
+                                            : '✖ ยกเลิกคำสั่งซื้อ'}
+                                    </button>
                                 </div>
                             </div>
                         )}
@@ -347,6 +352,9 @@ export default function OrdersPage() {
     const [showDateFilter, setShowDateFilter] = useState(false);
     const LIMIT = 20;
     const searchTimer = useRef(null);
+    
+    // Fetch function from AdminContext to trigger badge updates if order cancel/shipment changes stock
+    const { fetchLowStock } = useAdmin();
 
     const fetchOrders = useCallback(async (q = search) => {
         setLoading(true);
@@ -380,7 +388,7 @@ export default function OrdersPage() {
                     orderId={drawerOrderId.id}
                     focusNote={drawerOrderId.focusNote || false}
                     onClose={() => setDrawerOrderId(null)}
-                    onUpdated={() => fetchOrders()}
+                    onUpdated={() => { fetchOrders(); fetchLowStock(); }}
                 />
             )}
 
@@ -462,7 +470,7 @@ export default function OrdersPage() {
                             key={o.order_id}
                             order={o}
                             onOpen={setDrawerOrderId}
-                            onQuickUpdate={fetchOrders}
+                            onQuickUpdate={() => { fetchOrders(); fetchLowStock(); }}
                         />
                     ))}
                 </div>

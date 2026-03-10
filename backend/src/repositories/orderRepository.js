@@ -177,7 +177,7 @@ const createOrder = async ({ user_id, items, total_amount, payment_method, addre
     await db.query("BEGIN");
     try {
         const orderRes = await db.query(
-            "INSERT INTO orders (user_id, total_amount, status, payment_status) VALUES ($1, $2, 'pending', 'unpaid') RETURNING *",
+            "INSERT INTO orders (user_id, total_amount, status, payment_status) VALUES ($1, $2, 'pending', 'pending') RETURNING *",
             [user_id, total_amount]
         );
         const newOrder = orderRes.rows[0];
@@ -187,16 +187,16 @@ const createOrder = async ({ user_id, items, total_amount, payment_method, addre
                 "INSERT INTO order_items (order_id, variant_id, price, quantity) VALUES ($1, $2, $3, $4)",
                 [newOrder.order_id, item.variant_id, item.price, item.quantity]
             );
-            await db.query(
-                "UPDATE product_variants SET stock_quantity = stock_quantity - $1 WHERE variant_id = $2",
-                [item.quantity, item.variant_id]
-            );
+            // Removed deferred stock deduction, now handled by Omise Service on payment completion
         }
 
-        await db.query(
-            "INSERT INTO payments (order_id, method, status) VALUES ($1, $2, 'pending')",
-            [newOrder.order_id, payment_method]
-        );
+        if (payment_method && payment_method !== 'omise') {
+             // Fallback for legacy flows
+             await db.query(
+                 "INSERT INTO payments (order_id, method, status) VALUES ($1, $2, 'pending')",
+                 [newOrder.order_id, payment_method]
+             );
+        }
 
         // Resolve address_id — use provided id or create ad-hoc address
         let resolvedAddressId = address_id || null;

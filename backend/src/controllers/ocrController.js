@@ -1,4 +1,4 @@
-const Groq = require("groq-sdk");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 const multer = require("multer");
 const db = require("../config/supabaseClient");
 
@@ -13,8 +13,9 @@ const upload = multer({
     },
 });
 
-// ─── Groq client ────────────────────────────────────────────────────────────
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+// ─── Gemini client ───────────────────────────────────────────────────────────
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 // ─── OCR Scan ───────────────────────────────────────────────────────────────
 const scanImage = async (req, res) => {
@@ -24,7 +25,6 @@ const scanImage = async (req, res) => {
 
     try {
         const base64Image = req.file.buffer.toString("base64");
-        const dataUrl = `data:${req.file.mimetype};base64,${base64Image}`;
 
         const prompt = `
 วิเคราะห์รูปภาพนี้และดึงข้อมูลสินค้าทุกชิ้นที่เห็นออกมา
@@ -52,22 +52,15 @@ const scanImage = async (req, res) => {
 - ถ้าไม่มีสินค้าในรูปเลย ให้ตอบ []
 `;
 
-        const response = await groq.chat.completions.create({
-            model: "meta-llama/llama-4-scout-17b-16e-instruct",
-            messages: [
-                {
-                    role: "user",
-                    content: [
-                        { type: "text", text: prompt },
-                        { type: "image_url", image_url: { url: dataUrl } },
-                    ],
-                },
-            ],
-            temperature: 0.2,
-            max_tokens: 2048,
-        });
+        const imagePart = {
+            inlineData: {
+                data: base64Image,
+                mimeType: req.file.mimetype,
+            },
+        };
 
-        const rawText = response.choices[0]?.message?.content?.trim() || "";
+        const result = await model.generateContent([prompt, imagePart]);
+        const rawText = result.response.text().trim();
 
         // Parse JSON (strip markdown fences if present)
         let jsonText = rawText;

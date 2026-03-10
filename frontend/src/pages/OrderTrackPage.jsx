@@ -5,20 +5,16 @@ import './OrderTrackPage.css';
 
 const API = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
-const STEPS = ['pending', 'paid', 'processing', 'shipped', 'in_transit', 'delivered'];
+const STEPS = ['pending', 'shipping', 'completed'];
 
 const STATUS_CONFIG = {
-    pending: { label: 'รอดำเนินการ', icon: '🕐', color: '#f59e0b' },
-    paid: { label: 'ชำระเงินแล้ว', icon: '💳', color: '#3b82f6' },
-    processing: { label: 'กำลังเตรียม', icon: '📦', color: '#8b5cf6' },
-    shipped: { label: 'จัดส่งแล้ว', icon: '🚚', color: '#06b6d4' },
-    in_transit: { label: 'กำลังจัดส่ง', icon: '🛵', color: '#6366f1' },
-    delivered: { label: 'ส่งถึงแล้ว', icon: '✅', color: '#10b981' },
-    cancelled: { label: 'ยกเลิก', icon: '❌', color: '#ef4444' },
-    refunded: { label: 'คืนเงินแล้ว', icon: '↩️', color: '#6b7280' },
+    pending:   { label: 'รอยืนยัน',        icon: '🕐', color: '#f59e0b' },
+    shipping:  { label: 'กำลังจัดส่ง',     icon: '🚚', color: '#a855f7' },
+    completed: { label: 'จัดส่งสำเร็จ',    icon: '✅', color: '#10b981' },
+    cancelled: { label: 'ยกเลิกออร์เดอร์', icon: '❌', color: '#ef4444' },
 };
 
-const isCancelled = (status) => ['cancelled', 'refunded'].includes(status);
+const isCancelled = (status) => status === 'cancelled';
 
 function ProgressBar({ currentStatus }) {
     const cancelledOrRefunded = isCancelled(currentStatus);
