@@ -2,10 +2,11 @@
     position: sticky;
     top: 0;
     z-index: 100;
-    background: rgba(10, 14, 26, 0.85);
+    background: rgba(255, 255, 255, 0.92);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border-bottom: 1px solid var(--border);
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.06);
 }
 
 .navbar-inner {
@@ -171,7 +172,58 @@
 .user-menu {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 0;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    padding: 3px 4px 3px 4px;
+    transition: border-color var(--transition-fast);
+}
+
+.user-menu:hover {
+    border-color: var(--border-accent);
+}
+
+.user-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--cyan));
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.user-menu-divider {
+    width: 1px;
+    height: 18px;
+    background: var(--border);
+    flex-shrink: 0;
+    margin: 0 2px;
+}
+
+.logout-btn {
+    background: transparent;
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    flex-shrink: 0;
+    transition: all var(--transition-fast);
+    cursor: pointer;
+}
+
+.logout-btn:hover {
+    background: rgba(239, 68, 68, 0.12);
+    color: var(--danger);
 }
 
 .user-name {
@@ -186,11 +238,12 @@
 .user-name-link {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     font-size: 13px;
     color: var(--text-secondary);
     text-decoration: none;
     max-width: 140px;
+    padding: 0 8px 0 4px;
     transition: color var(--transition-fast);
 }
 .user-name-link span {
@@ -199,7 +252,7 @@
     white-space: nowrap;
 }
 .user-name-link:hover {
-    color: var(--accent-light);
+    color: var(--text-primary);
 }
 
 .mobile-menu-btn {

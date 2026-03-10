@@ -10,8 +10,8 @@
     align-items: flex-end;
     gap: 12px;
     flex-wrap: wrap;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: 12px;
     padding: 14px 20px;
 }
@@ -41,8 +41,8 @@
     display: flex;
     gap: 6px;
     flex-wrap: wrap;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: 12px;
     padding: 6px;
 }
@@ -63,14 +63,14 @@
 }
 
 .rpt-tab-btn:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: #fff;
+    background: rgba(0, 0, 0, 0.04);
+    color: #374151;
 }
 
 .rpt-tab-btn.active {
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(139, 92, 246, 0.2));
-    color: #fff;
-    box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.4);
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.12), rgba(168, 85, 247, 0.08));
+    color: #7c3aed;
+    box-shadow: 0 0 0 1px rgba(124, 58, 237, 0.25);
 }
 
 /* ── Stat Cards ── */
@@ -103,16 +103,16 @@
 }
 
 .rpt-stat-card {
-    background: #13151f;
-    border: 1px solid rgba(255, 255, 255, 0.07);
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: 16px;
     padding: 20px 24px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
 }
 
 .rpt-stat-label {
     font-size: 11px;
-    color: rgba(255, 255, 255, 0.4);
+    color: #6b7280;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.6px;
@@ -126,23 +126,23 @@
 
 .rpt-stat-sub {
     font-size: 11px;
-    color: rgba(255, 255, 255, 0.3);
+    color: #9ca3af;
     margin-top: 6px;
 }
 
 /* ── Chart Card ── */
 .rpt-chart-card {
-    background: #13151f;
-    border: 1px solid rgba(255, 255, 255, 0.07);
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: 20px;
     padding: 24px;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
 }
 
 .rpt-chart-title {
     font-size: 14px;
     font-weight: 700;
-    color: rgba(255, 255, 255, 0.9);
+    color: #111827;
     margin: 0 0 20px 0;
 }
 
@@ -189,11 +189,11 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    background: rgba(239, 68, 68, 0.12);
-    border: 1px solid rgba(239, 68, 68, 0.25);
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.2);
     border-radius: 10px;
     padding: 0.75rem 1rem;
-    color: #fca5a5;
+    color: #dc2626;
     font-size: 0.88rem;
     font-weight: 600;
 }

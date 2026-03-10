@@ -1,5 +1,5 @@
 /* ================================================================
-   ORDERS PAGE — Local Delivery Card Theme
+   ORDERS PAGE — Light Theme
    ================================================================ */
 
 /* ── Status Badge ── */
@@ -24,8 +24,8 @@
 }
 
 .ord-filter-active {
-    border-color: rgba(170, 93, 198, 0.5) !important;
-    color: #AA5DC6 !important;
+    border-color: rgba(124, 58, 237, 0.5) !important;
+    color: #7c3aed !important;
 }
 
 /* ── Date bar (collapsible) ── */
@@ -35,7 +35,7 @@
     gap: 10px;
     padding: 12px 0;
     flex-wrap: wrap;
-    border-bottom: 1px solid rgba(170, 93, 198, 0.1);
+    border-bottom: 1px solid rgba(124, 58, 237, 0.1);
     margin-bottom: 12px;
     animation: fadeIn 0.2s ease;
 }
@@ -53,21 +53,21 @@
 }
 
 .orders-date-input {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(170, 93, 198, 0.2);
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.12);
     border-radius: 10px;
-    color: rgba(255, 255, 255, 0.75);
+    color: #374151;
     font-size: 13px;
     padding: 7px 12px;
     min-height: 36px;
     font-family: inherit;
     cursor: pointer;
     transition: border-color 0.15s;
-    color-scheme: dark;
+    color-scheme: light;
 }
 
 .orders-date-input:focus {
-    border-color: rgba(170, 93, 198, 0.5);
+    border-color: rgba(124, 58, 237, 0.5);
     outline: none;
 }
 
@@ -90,7 +90,7 @@
     border-radius: 10px;
     font-size: 13px;
     font-weight: 500;
-    color: rgba(255, 255, 255, 0.4);
+    color: #6b7280;
     background: transparent;
     border: 1px solid transparent;
     cursor: pointer;
@@ -101,12 +101,12 @@
 }
 
 .ord-tab:hover {
-    color: rgba(255, 255, 255, 0.75);
+    color: #374151;
 }
 
 .ord-tab-active {
-    color: #AA5DC6;
-    border-bottom-color: #AA5DC6;
+    color: #7c3aed;
+    border-bottom-color: #7c3aed;
     font-weight: 700;
 }
 
@@ -120,9 +120,9 @@
 
 /* ── Order Card ── */
 .ord-card {
-    background: #160C3D;
-    border: 1px solid rgba(170, 93, 198, 0.15);
-    border-left: 4px solid #5D2B7E;
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-left: 4px solid #7c3aed;
     border-radius: 16px;
     padding: 16px;
     cursor: pointer;
@@ -134,8 +134,8 @@
 }
 
 .ord-card:hover {
-    border-color: rgba(170, 93, 198, 0.4);
-    box-shadow: 0 6px 24px rgba(93, 43, 126, 0.25);
+    border-color: rgba(124, 58, 237, 0.3);
+    box-shadow: 0 6px 24px rgba(124, 58, 237, 0.12);
     transform: translateY(-2px);
 }
 
@@ -149,13 +149,13 @@
 .ord-card-id {
     font-weight: 800;
     font-size: 15px;
-    color: rgba(255, 255, 255, 0.9);
+    color: #111827;
     flex-shrink: 0;
 }
 
 .ord-card-time {
     font-size: 11px;
-    color: rgba(255, 255, 255, 0.25);
+    color: #9ca3af;
     margin-left: auto;
     flex-shrink: 0;
 }
@@ -165,7 +165,7 @@
     align-items: center;
     gap: 6px;
     font-size: 13px;
-    color: rgba(255, 255, 255, 0.7);
+    color: #4b5563;
 }
 
 .ord-card-call {
@@ -173,8 +173,8 @@
     font-size: 11px;
     padding: 2px 8px;
     border-radius: 6px;
-    background: rgba(16, 185, 129, 0.12);
-    color: #34d399;
+    background: rgba(16, 185, 129, 0.1);
+    color: #059669;
     border: 1px solid rgba(16, 185, 129, 0.25);
     text-decoration: none;
     font-weight: 600;
@@ -182,7 +182,7 @@
 }
 
 .ord-card-call:hover {
-    background: rgba(16, 185, 129, 0.25);
+    background: rgba(16, 185, 129, 0.2);
 }
 
 .ord-card-meta {
@@ -194,23 +194,23 @@
 .ord-card-amount {
     font-size: 18px;
     font-weight: 800;
-    color: #AA5DC6;
+    color: #7c3aed;
 }
 
 .tracking-code {
     font-family: monospace;
     font-size: 11px;
-    background: rgba(170, 93, 198, 0.15);
+    background: rgba(124, 58, 237, 0.08);
     padding: 2px 6px;
     border-radius: 4px;
-    color: #AA5DC6;
+    color: #7c3aed;
 }
 
 .ord-card-actions {
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
-    border-top: 1px solid rgba(170, 93, 198, 0.1);
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
     padding-top: 10px;
     margin-top: 2px;
 }
@@ -224,7 +224,7 @@
 
 .ord-card-detail-hint {
     font-size: 11px;
-    color: rgba(255, 255, 255, 0.2);
+    color: #9ca3af;
     text-align: right;
     margin-top: -4px;
 }
@@ -236,7 +236,7 @@
     align-items: center;
     justify-content: center;
     padding: 80px 0;
-    color: rgba(255, 255, 255, 0.3);
+    color: #9ca3af;
     font-size: 14px;
 }
 
@@ -253,7 +253,7 @@
 .ord-drawer-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(4px);
     z-index: 1000;
     display: flex;
@@ -264,11 +264,11 @@
     width: 100%;
     max-width: 440px;
     height: 100vh;
-    background: #160C3D;
-    border-left: 1px solid rgba(170, 93, 198, 0.2);
+    background: #ffffff;
+    border-left: 1px solid rgba(0, 0, 0, 0.08);
     display: flex;
     flex-direction: column;
-    box-shadow: -12px 0 48px rgba(7, 3, 28, 0.6);
+    box-shadow: -12px 0 48px rgba(0, 0, 0, 0.1);
     animation: drawerIn 0.25s ease;
     overflow: hidden;
 }
@@ -290,15 +290,16 @@
     align-items: flex-start;
     justify-content: space-between;
     padding: 20px;
-    border-bottom: 1px solid rgba(170, 93, 198, 0.12);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
     gap: 12px;
     flex-shrink: 0;
+    background: rgba(0, 0, 0, 0.02);
 }
 
 .ord-drawer-title {
     font-size: 18px;
     font-weight: 800;
-    color: rgba(255, 255, 255, 0.9);
+    color: #111827;
     margin-bottom: 6px;
 }
 
@@ -313,8 +314,8 @@
 
 /* ── Info rows ── */
 .ord-info-block {
-    background: rgba(170, 93, 198, 0.05);
-    border: 1px solid rgba(170, 93, 198, 0.12);
+    background: rgba(124, 58, 237, 0.03);
+    border: 1px solid rgba(124, 58, 237, 0.1);
     border-radius: 14px;
     padding: 14px;
     display: flex;
@@ -329,14 +330,14 @@
 }
 
 .ord-info-icon {
-    color: #AA5DC6;
+    color: #7c3aed;
     flex-shrink: 0;
     margin-top: 2px;
 }
 
 .ord-info-label {
     font-size: 11px;
-    color: rgba(255, 255, 255, 0.3);
+    color: #9ca3af;
     text-transform: uppercase;
     letter-spacing: 0.4px;
     margin-bottom: 2px;
@@ -344,7 +345,7 @@
 
 .ord-info-val {
     font-size: 13px;
-    color: rgba(255, 255, 255, 0.8);
+    color: #374151;
     font-weight: 500;
     line-height: 1.4;
 }
@@ -356,8 +357,8 @@
     gap: 5px;
     padding: 5px 12px;
     border-radius: 8px;
-    background: rgba(16, 185, 129, 0.12);
-    color: #34d399;
+    background: rgba(16, 185, 129, 0.1);
+    color: #059669;
     border: 1px solid rgba(16, 185, 129, 0.25);
     font-size: 12px;
     font-weight: 600;
@@ -366,13 +367,13 @@
 }
 
 .ord-call-btn:hover {
-    background: rgba(16, 185, 129, 0.25);
+    background: rgba(16, 185, 129, 0.2);
 }
 
 /* ── Sections ── */
 .ord-section {
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(170, 93, 198, 0.1);
+    background: rgba(0, 0, 0, 0.02);
+    border: 1px solid rgba(0, 0, 0, 0.07);
     border-radius: 14px;
     padding: 14px;
 }
@@ -380,7 +381,7 @@
 .ord-section-title {
     font-size: 11px;
     font-weight: 700;
-    color: rgba(255, 255, 255, 0.4);
+    color: #6b7280;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin-bottom: 10px;
@@ -410,23 +411,23 @@
     border-radius: 8px;
     object-fit: cover;
     flex-shrink: 0;
-    border: 1px solid rgba(170, 93, 198, 0.15);
+    border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 .ord-item-name {
     flex: 1;
-    color: rgba(255, 255, 255, 0.8);
+    color: #374151;
     font-weight: 500;
 }
 
 .ord-item-qty {
-    color: rgba(255, 255, 255, 0.4);
+    color: #6b7280;
     font-size: 12px;
     flex-shrink: 0;
 }
 
 .ord-item-price {
-    color: #AA5DC6;
+    color: #7c3aed;
     font-weight: 700;
     flex-shrink: 0;
 }
@@ -435,16 +436,16 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-top: 1px solid rgba(170, 93, 198, 0.1);
+    border-top: 1px solid rgba(0, 0, 0, 0.07);
     padding-top: 10px;
     font-weight: 700;
-    color: rgba(255, 255, 255, 0.7);
+    color: #374151;
     font-size: 14px;
 }
 
 .ord-total-val {
     font-size: 20px;
-    color: #AA5DC6;
+    color: #7c3aed;
 }
 
 /* ── Timeline ── */
@@ -473,7 +474,7 @@
     top: 18px;
     width: 2px;
     bottom: 0;
-    background: rgba(170, 93, 198, 0.12);
+    background: rgba(0, 0, 0, 0.08);
 }
 
 .ord-tl-dot {
@@ -494,18 +495,18 @@
 
 .ord-tl-note {
     font-size: 12px;
-    color: rgba(255, 255, 255, 0.4);
+    color: #6b7280;
 }
 
 .ord-tl-time {
     font-size: 11px;
-    color: rgba(255, 255, 255, 0.2);
+    color: #9ca3af;
 }
 
 /* ── Action section ── */
 .ord-actions-section {
-    background: rgba(170, 93, 198, 0.04);
-    border-color: rgba(170, 93, 198, 0.2) !important;
+    background: rgba(124, 58, 237, 0.03);
+    border-color: rgba(124, 58, 237, 0.15) !important;
 }
 
 .ord-action-btns {
@@ -523,7 +524,7 @@
 .modal-close {
     background: transparent;
     border: none;
-    color: rgba(255, 255, 255, 0.3);
+    color: #9ca3af;
     cursor: pointer;
     padding: 4px;
     border-radius: 6px;
@@ -534,19 +535,19 @@
 }
 
 .modal-close:hover {
-    color: rgba(255, 255, 255, 0.85);
+    color: #111827;
 }
 
-/* ── Badge extras (keep for compatibility) ── */
+/* ── Badge extras ── */
 .badge-indigo {
-    background: rgba(80, 77, 156, 0.18);
-    color: #a5b4fc;
-    border: 1px solid rgba(80, 77, 156, 0.3);
+    background: rgba(79, 70, 229, 0.1);
+    color: #4f46e5;
+    border: 1px solid rgba(79, 70, 229, 0.25);
 }
 
 .badge-blue {
-    background: rgba(59, 130, 246, 0.15);
-    color: #93c5fd;
+    background: rgba(59, 130, 246, 0.1);
+    color: #2563eb;
     border: 1px solid rgba(59, 130, 246, 0.25);
 }
 

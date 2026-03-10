@@ -1,6 +1,6 @@
 .track-page {
     min-height: 100vh;
-    background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+    background: #f5f6fa;
     padding: 2rem 1rem 5rem;
 }
 
@@ -20,13 +20,13 @@
 }
 
 .track-back-link:hover {
-    color: #a5b4fc;
+    color: #7c3aed;
 }
 
 .track-title {
     font-size: 1.8rem;
     font-weight: 800;
-    color: #f9fafb;
+    color: #111827;
     margin: 0;
 }
 
@@ -41,15 +41,16 @@
 .status-hero {
     text-align: center;
     padding: 2rem;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.07);
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: 20px;
     margin-bottom: 2rem;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
 }
 
 .status-hero.cancelled {
     border-color: rgba(239, 68, 68, 0.3);
-    background: rgba(239, 68, 68, 0.05);
+    background: rgba(239, 68, 68, 0.03);
 }
 
 .status-hero-icon {
@@ -65,8 +66,8 @@
 .cancelled-badge {
     display: inline-block;
     margin-top: 0.75rem;
-    background: rgba(239, 68, 68, 0.15);
-    color: #f87171;
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
     padding: 0.3rem 1rem;
     border-radius: 30px;
     font-size: 0.85rem;
@@ -81,10 +82,11 @@
     gap: 0;
     margin-bottom: 2rem;
     padding: 1.5rem;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.07);
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: 20px;
     overflow-x: auto;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
 }
 
 .step-node {
@@ -99,8 +101,8 @@
     width: 42px;
     height: 42px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.06);
-    border: 2px solid rgba(255, 255, 255, 0.12);
+    background: rgba(0, 0, 0, 0.04);
+    border: 2px solid rgba(0, 0, 0, 0.1);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -112,16 +114,16 @@
 }
 
 .step-node.done .step-circle {
-    background: rgba(99, 102, 241, 0.25);
-    border-color: #6366f1;
-    color: #a5b4fc;
+    background: rgba(124, 58, 237, 0.1);
+    border-color: #7c3aed;
+    color: #7c3aed;
 }
 
 .step-node.active .step-circle {
-    background: linear-gradient(135deg, #6366f1, #8b5cf6);
-    border-color: #6366f1;
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    border-color: #7c3aed;
     color: white;
-    box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+    box-shadow: 0 0 20px rgba(124, 58, 237, 0.35);
     transform: scale(1.15);
     font-size: 1.2rem;
 }
@@ -139,39 +141,40 @@
 }
 
 .step-node.done .step-label {
-    color: #a5b4fc;
+    color: #7c3aed;
 }
 
 .step-node.active .step-label {
-    color: #f9fafb;
+    color: #111827;
     font-weight: 700;
 }
 
 .step-line {
     flex: 1;
     height: 2px;
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(0, 0, 0, 0.08);
     margin-top: 20px;
     min-width: 20px;
     transition: background 0.3s;
 }
 
 .step-line.done {
-    background: linear-gradient(90deg, #6366f1, #8b5cf6);
+    background: linear-gradient(90deg, #7c3aed, #a855f7);
 }
 
 /* Tracking Card */
 .tracking-card {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: 16px;
     padding: 1.25rem;
     margin-bottom: 2rem;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
 }
 
 .tracking-card-title {
     font-weight: 700;
-    color: #f9fafb;
+    color: #111827;
     margin-bottom: 1rem;
     font-size: 1rem;
 }
@@ -197,16 +200,16 @@
 
 .ti-value {
     font-size: 0.95rem;
-    color: #d1d5db;
+    color: #374151;
     font-weight: 600;
 }
 
 .tracking-num {
     font-family: monospace;
-    background: rgba(99, 102, 241, 0.12);
+    background: rgba(124, 58, 237, 0.08);
     padding: 0.25rem 0.6rem;
     border-radius: 6px;
-    color: #a5b4fc;
+    color: #7c3aed;
     letter-spacing: 0.5px;
 }
 
@@ -218,7 +221,7 @@
 .timeline-title {
     font-size: 1.1rem;
     font-weight: 700;
-    color: #f9fafb;
+    color: #111827;
     margin-bottom: 1.25rem;
 }
 
@@ -259,7 +262,7 @@
     width: 2px;
     flex: 1;
     min-height: 24px;
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(0, 0, 0, 0.08);
     margin: 4px 0;
 }
 
@@ -276,7 +279,7 @@
 
 .tl-note {
     font-size: 0.85rem;
-    color: #9ca3af;
+    color: #6b7280;
     margin-bottom: 0.3rem;
 }
 
@@ -289,7 +292,7 @@
 .tl-by {
     font-size: 0.75rem;
     color: #6b7280;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.04);
     padding: 0.15rem 0.5rem;
     border-radius: 4px;
 }
@@ -303,7 +306,7 @@
 .track-error {
     text-align: center;
     padding: 5rem 2rem;
-    color: #9ca3af;
+    color: #6b7280;
 }
 
 .error-icon {
@@ -314,9 +317,9 @@
 .btn-back {
     display: inline-block;
     margin-top: 1.5rem;
-    background: rgba(99, 102, 241, 0.15);
-    border: 1px solid rgba(99, 102, 241, 0.35);
-    color: #a5b4fc;
+    background: rgba(124, 58, 237, 0.08);
+    border: 1px solid rgba(124, 58, 237, 0.25);
+    color: #7c3aed;
     padding: 0.6rem 1.4rem;
     border-radius: 10px;
     text-decoration: none;
@@ -325,8 +328,8 @@
 }
 
 .btn-back:hover {
-    background: rgba(99, 102, 241, 0.3);
-    color: white;
+    background: rgba(124, 58, 237, 0.15);
+    color: #6d28d9;
 }
 
 /* Skeletons */
@@ -334,7 +337,7 @@
 .track-skeleton-bar,
 .track-skeleton-card {
     border-radius: 16px;
-    background: linear-gradient(90deg, #1f2937 25%, #2d3748 50%, #1f2937 75%);
+    background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
     background-size: 200% 100%;
     animation: shimmer 1.4s infinite;
     margin-bottom: 1.5rem;

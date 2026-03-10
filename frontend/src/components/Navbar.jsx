@@ -74,11 +74,14 @@ const Navbar = () => {
                         {user ? (
                             <div className="user-menu">
                                 <Link to="/profile" className="user-name-link" title="โปรไฟล์">
-                                    <User size={14} />
+                                    <div className="user-avatar">
+                                        {(user.full_name || user.phone_number || user.phone || '?')[0].toUpperCase()}
+                                    </div>
                                     <span>{user.full_name || user.phone || user.phone_number}</span>
                                 </Link>
-                                <button className="icon-btn" onClick={logout} title="ออกจากระบบ">
-                                    <LogOut size={18} />
+                                <div className="user-menu-divider" />
+                                <button className="logout-btn" onClick={logout} title="ออกจากระบบ">
+                                    <LogOut size={16} />
                                 </button>
                             </div>
                         ) : (
